@@ -2,8 +2,11 @@ package main
 
 import (
 	"net/http"
+	"os"
+	"shelldrop/log"
 	"shelldrop/payloads"
 	"strings"
+	"time"
 )
 
 type (
@@ -30,9 +33,16 @@ func (i *Injector) Do() error {
 		return err
 	}
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 3 * time.Second,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
+		if os.IsTimeout(err) {
+			log.Infof("Found successful payload: %s", i.payloadName)
+			return nil
+		}
+
 		return err
 	}
 	defer resp.Body.Close()

