@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -12,14 +13,16 @@ import (
 
 type Listener struct {
 	ListenerConfig
-	connChan chan net.Conn
-	listener net.Listener
+	listener    net.Listener
+	connections chan net.Conn
+	cancel      context.CancelFunc
 }
 
-func NewReverseShellListener(cfg ListenerConfig) *Listener {
+func NewListener(cfg ListenerConfig, cancel context.CancelFunc) *Listener {
 	return &Listener{
 		ListenerConfig: cfg,
-		connChan:       make(chan net.Conn, 1), // Buffer of 1 since only 1 connection pending
+		connections:    make(chan net.Conn, 1),
+		cancel:         cancel,
 	}
 }
 
@@ -51,9 +54,10 @@ func (r *Listener) acceptConnections() {
 		}
 
 		log.Infof("Connection received from %s", conn.RemoteAddr().String())
+		r.cancel()
 
 		select {
-		case r.connChan <- conn:
+		case r.connections <- conn:
 		default:
 			log.Warn("Connection rejected: already have a pending connection")
 			conn.Close()
@@ -62,7 +66,7 @@ func (r *Listener) acceptConnections() {
 }
 
 func (r *Listener) Interact() error {
-	conn := <-r.connChan
+	conn := <-r.connections
 	defer conn.Close()
 
 	log.Infof("Dropping shell to %s", conn.RemoteAddr().String())
@@ -81,7 +85,6 @@ func (r *Listener) Interact() error {
 
 	<-done
 
-	log.Info("Reverse shell closed")
 	return nil
 }
 

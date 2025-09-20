@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"net/http"
 	"os"
 	"shelldrop/log"
@@ -25,10 +27,10 @@ func NewInjector(payloadName string) *Injector {
 	}
 }
 
-func (i *Injector) Do() error {
+func (i *Injector) Do(ctx context.Context) error {
 	url := i.setPayload(i.url)
 
-	req, err := http.NewRequest(i.method, url, nil)
+	req, err := http.NewRequestWithContext(ctx, i.method, url, nil)
 	if err != nil {
 		return err
 	}
@@ -38,7 +40,7 @@ func (i *Injector) Do() error {
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		if os.IsTimeout(err) {
+		if os.IsTimeout(err) || errors.Is(err, context.Canceled) {
 			log.Infof("Found successful payload: %s", i.payloadName)
 			return nil
 		}
