@@ -54,7 +54,7 @@ func injectPayload(payload string, cfg *Config, ctx context.Context) bool {
 
 	if err := injector.Do(ctx); err != nil {
 		if os.IsTimeout(err) || errors.Is(err, context.Canceled) {
-			log.Infof("Found successful payload: %s", payload)
+			log.Successf("Found successful payload: %s", payload)
 
 			if cfg.Listener.Disabled {
 				log.Info("Check your listener for the reverse shell")

@@ -41,7 +41,6 @@ func (r *Listener) Start() {
 	r.listener = listener
 
 	log.Infof("Reverse shell listener started on %s:%d", r.ListenerConfig.Host, r.ListenerConfig.Port)
-	log.Info("Ready for connections...")
 
 	go r.acceptConnections()
 }
@@ -58,7 +57,7 @@ func (r *Listener) acceptConnections() {
 			return
 		}
 
-		log.Infof("Connection received from %s", conn.RemoteAddr().String())
+		log.Successf("Connection received from %s", conn.RemoteAddr().String())
 		r.cancel()
 
 		select {
