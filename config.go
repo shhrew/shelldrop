@@ -39,7 +39,7 @@ func ParseConfig() *Config {
 	lport := parser.Int("p", "lport", &argparse.Options{Required: true, Help: "The listen port"})
 	payload := parser.String("P", "payload", &argparse.Options{Required: false, Help: "Specific payload to use"})
 	url := parser.String("u", "url", &argparse.Options{Required: true, Help: "The target url [*]"})
-	method := parser.Selector("X", "method", []string{"GET", "POST"}, &argparse.Options{Required: false, Help: "The request method", Default: "GET"})
+	method := parser.Selector("X", "method", []string{"GET", "POST", "PUT", "PATCH", "DELETE"}, &argparse.Options{Required: false, Help: "The request method", Default: "GET"})
 	data := parser.String("d", "data", &argparse.Options{Required: false, Help: "POST data [*]"})
 
 	noListener := parser.Flag("", "no-listener", &argparse.Options{Required: false, Help: "Disable the built-in listener"})

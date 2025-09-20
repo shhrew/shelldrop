@@ -26,7 +26,8 @@ go build -o shelldrop
 ```bash
 usage: shelldrop [-h|--help] -l|--lhost "<value>" -p|--lport <integer>
                  [-P|--payload "<value>"] -u|--url "<value>" [-X|--method
-                 (GET|POST)] [-d|--data "<value>"] [--no-listener] [--no-color]
+                 (GET|POST|PUT|PATCH|DELETE)] [-d|--data "<value>"]
+                 [--no-listener] [--no-color]
 
                  A command injection tool that automatically tests for working
                  reverse shell payloads.
