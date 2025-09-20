@@ -24,7 +24,9 @@ type (
 	}
 
 	RequestConfig struct {
-		Url string
+		Url    string
+		Method string
+		Data   string
 	}
 )
 
@@ -33,10 +35,13 @@ func ParseConfig() *Config {
 
 [*] = Asterisked arguments can contain the SHELLDROP injection keyword`))
 
-	url := parser.String("u", "url", &argparse.Options{Required: true, Help: "The target url [*]"})
 	lhost := parser.String("l", "lhost", &argparse.Options{Required: true, Help: "The listen address"})
 	lport := parser.Int("p", "lport", &argparse.Options{Required: true, Help: "The listen port"})
-	payload := parser.String("P", "payload", &argparse.Options{Required: false, Help: "Optional payload to use"})
+	payload := parser.String("P", "payload", &argparse.Options{Required: false, Help: "Specific payload to use"})
+	url := parser.String("u", "url", &argparse.Options{Required: true, Help: "The target url [*]"})
+	method := parser.Selector("X", "method", []string{"GET", "POST"}, &argparse.Options{Required: false, Help: "The request method", Default: "GET"})
+	data := parser.String("d", "data", &argparse.Options{Required: false, Help: "POST data [*]"})
+
 	noListener := parser.Flag("", "no-listener", &argparse.Options{Required: false, Help: "Disable the built-in listener"})
 	noColor := parser.Flag("", "no-color", &argparse.Options{Required: false, Help: "Disable color output"})
 
@@ -57,7 +62,9 @@ func ParseConfig() *Config {
 			Port:     *lport,
 		},
 		Request: RequestConfig{
-			Url: *url,
+			Url:    *url,
+			Method: *method,
+			Data:   *data,
 		},
 	}
 
@@ -70,6 +77,9 @@ func ParseConfig() *Config {
 
 func (c *Config) hasShellDropKeyword() bool {
 	if strings.Contains(c.Request.Url, ShellDropKeyword) {
+		return true
+	}
+	if strings.Contains(c.Request.Data, ShellDropKeyword) {
 		return true
 	}
 
