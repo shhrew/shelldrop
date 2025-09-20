@@ -1,6 +1,6 @@
 # Shelldrop
 
-A command injection exploitation tool that leverages an injection point by automatically finding and testing for compatible reverse shell payloads.
+A command injection tool that leverages an injection point by automatically testing for working reverse shell payloads.
 
 Shelldrop works by injecting payloads into the provided `SHELLDROP` keyword/placeholder.
 
