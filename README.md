@@ -23,7 +23,7 @@ go build -o shelldrop
 
 ## Usage
 
-```bash
+```text
 usage: shelldrop [-h|--help] -l|--lhost "<value>" -p|--lport <integer>
                  [-P|--payload "<value>"] -u|--url "<value>" [-X|--method
                  (GET|POST|PUT|PATCH|DELETE)] [-d|--data "<value>"]
