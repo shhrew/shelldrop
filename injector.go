@@ -2,10 +2,7 @@ package main
 
 import (
 	"context"
-	"errors"
 	"net/http"
-	"os"
-	"shelldrop/log"
 	"shelldrop/payloads"
 	"strings"
 	"time"
@@ -40,11 +37,6 @@ func (i *Injector) Do(ctx context.Context) error {
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		if os.IsTimeout(err) || errors.Is(err, context.Canceled) {
-			log.Infof("Found successful payload: %s", i.payloadName)
-			return nil
-		}
-
 		return err
 	}
 	defer resp.Body.Close()
