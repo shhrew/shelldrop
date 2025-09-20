@@ -17,6 +17,7 @@ type (
 		method         string
 		url            string
 		data           string
+		headers        map[string]string
 	}
 )
 
@@ -29,7 +30,7 @@ func NewInjector(payloadName string) *Injector {
 func (i *Injector) Do(ctx context.Context) error {
 	log.Infof("Testing %s", i.payloadName)
 
-	url := i.setPayload(i.url)
+	url := i.setPayloadUrlEncoded(i.url)
 	var body io.Reader = nil
 
 	if i.hasData() {
@@ -41,8 +42,10 @@ func (i *Injector) Do(ctx context.Context) error {
 		return err
 	}
 
-	if i.hasData() {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if i.headers != nil {
+		for k, v := range i.headers {
+			req.Header.Set(k, i.setPayload(v))
+		}
 	}
 
 	client := &http.Client{
@@ -77,11 +80,21 @@ func (i *Injector) WithData(data string) *Injector {
 	return i
 }
 
+func (i *Injector) WithHeaders(headers map[string]string) *Injector {
+	i.headers = headers
+	return i
+}
+
 func (i *Injector) hasData() bool {
 	return i.data != ""
 }
 
 func (i *Injector) setPayload(value string) string {
+	payload := payloads.Get(i.payloadName, i.listenerConfig.Host, i.listenerConfig.Port)
+	return strings.Replace(value, ShellDropKeyword, payload, -1)
+}
+
+func (i *Injector) setPayloadUrlEncoded(value string) string {
 	payload := payloads.GetUrlEncoded(i.payloadName, i.listenerConfig.Host, i.listenerConfig.Port)
 	return strings.Replace(value, ShellDropKeyword, payload, -1)
 }

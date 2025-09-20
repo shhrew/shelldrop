@@ -52,7 +52,8 @@ func injectPayload(payload string, cfg *Config, ctx context.Context) bool {
 		WithListenerConfig(cfg.Listener).
 		WithMethod(cfg.Request.Method).
 		WithUrl(cfg.Request.Url).
-		WithData(cfg.Request.Data)
+		WithData(cfg.Request.Data).
+		WithHeaders(cfg.Request.Headers)
 
 	if err := injector.Do(ctx); err != nil {
 		if os.IsTimeout(err) || errors.Is(err, context.Canceled) {
