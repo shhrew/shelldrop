@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"net"
 	"os"
@@ -26,10 +25,10 @@ func NewListener(cfg ListenerConfig, cancel context.CancelFunc) *Listener {
 	}
 }
 
-func (r *Listener) Start() error {
+func (r *Listener) Start() {
 	listener, err := net.Listen("tcp", r.ListenerConfig.Host+":"+strconv.Itoa(r.ListenerConfig.Port))
 	if err != nil {
-		return fmt.Errorf("failed to start listener: %v", err)
+		log.Fatalf("Failed to start listener: %v", err)
 	}
 	r.listener = listener
 
@@ -37,8 +36,6 @@ func (r *Listener) Start() error {
 	log.Info("Ready for connections...")
 
 	go r.acceptConnections()
-
-	return nil
 }
 
 func (r *Listener) acceptConnections() {
@@ -65,7 +62,7 @@ func (r *Listener) acceptConnections() {
 	}
 }
 
-func (r *Listener) Interact() error {
+func (r *Listener) Interact() {
 	conn := <-r.connections
 	defer conn.Close()
 
@@ -84,8 +81,6 @@ func (r *Listener) Interact() error {
 	}()
 
 	<-done
-
-	return nil
 }
 
 func (r *Listener) Close() error {

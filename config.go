@@ -9,6 +9,7 @@ import (
 
 type (
 	Config struct {
+		Payload  string
 		Listener ListenerConfig
 		Request  RequestConfig
 	}
@@ -31,13 +32,17 @@ func ParseConfig() *Config {
 	url := parser.String("u", "url", &argparse.Options{Required: true, Help: "The target url [*]"})
 	lhost := parser.String("l", "lhost", &argparse.Options{Required: true, Help: "The listen address"})
 	lport := parser.Int("p", "lport", &argparse.Options{Required: true, Help: "The listen port"})
+	payload := parser.String("P", "payload", &argparse.Options{Required: false, Help: "Optional payload to use"})
 
 	if err := parser.Parse(os.Args); err != nil {
 		fmt.Print(parser.Usage(err))
 		os.Exit(1)
 	}
 
+	// todo: validate at least one argument has SHELLDROP keyword
+
 	return &Config{
+		Payload: *payload,
 		Listener: ListenerConfig{
 			Host: *lhost,
 			Port: *lport,
