@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"os"
@@ -26,6 +27,13 @@ func NewListener(cfg ListenerConfig, cancel context.CancelFunc) *Listener {
 }
 
 func (r *Listener) Start() {
+	fmt.Println(r.ListenerConfig.Disabled)
+
+	if r.ListenerConfig.Disabled {
+		log.Warn("Built-in listener is disabled, ensure your own is running on the specified host and port")
+		return
+	}
+
 	listener, err := net.Listen("tcp", r.ListenerConfig.Host+":"+strconv.Itoa(r.ListenerConfig.Port))
 	if err != nil {
 		log.Fatalf("Failed to start listener: %v", err)

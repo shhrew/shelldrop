@@ -15,8 +15,9 @@ type (
 	}
 
 	ListenerConfig struct {
-		Host string
-		Port int
+		Disabled bool
+		Host     string
+		Port     int
 	}
 
 	RequestConfig struct {
@@ -33,6 +34,7 @@ func ParseConfig() *Config {
 	lhost := parser.String("l", "lhost", &argparse.Options{Required: true, Help: "The listen address"})
 	lport := parser.Int("p", "lport", &argparse.Options{Required: true, Help: "The listen port"})
 	payload := parser.String("P", "payload", &argparse.Options{Required: false, Help: "Optional payload to use"})
+	noListener := parser.Flag("", "no-listener", &argparse.Options{Required: false, Help: "Disable the built-in listener"})
 
 	if err := parser.Parse(os.Args); err != nil {
 		fmt.Print(parser.Usage(err))
@@ -44,8 +46,9 @@ func ParseConfig() *Config {
 	return &Config{
 		Payload: *payload,
 		Listener: ListenerConfig{
-			Host: *lhost,
-			Port: *lport,
+			Disabled: *noListener,
+			Host:     *lhost,
+			Port:     *lport,
 		},
 		Request: RequestConfig{
 			Url: *url,
