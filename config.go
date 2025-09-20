@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/akamensky/argparse"
+	"github.com/fatih/color"
 )
 
 type (
@@ -37,10 +38,15 @@ func ParseConfig() *Config {
 	lport := parser.Int("p", "lport", &argparse.Options{Required: true, Help: "The listen port"})
 	payload := parser.String("P", "payload", &argparse.Options{Required: false, Help: "Optional payload to use"})
 	noListener := parser.Flag("", "no-listener", &argparse.Options{Required: false, Help: "Disable the built-in listener"})
+	noColor := parser.Flag("", "no-color", &argparse.Options{Required: false, Help: "Disable color output"})
 
 	if err := parser.Parse(os.Args); err != nil {
 		fmt.Print(parser.Usage(err))
 		os.Exit(1)
+	}
+
+	if *noColor {
+		color.NoColor = true
 	}
 
 	cfg := &Config{
