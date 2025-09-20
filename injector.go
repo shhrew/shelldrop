@@ -71,9 +71,6 @@ func (i *Injector) Do(ctx context.Context) error {
 	}
 	defer resp.Body.Close()
 
-	b, _ := io.ReadAll(resp.Body)
-	log.Infof("Response: %s", string(b))
-
 	return nil
 }
 

