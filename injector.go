@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"shelldrop/log"
 	"shelldrop/payloads"
 	"strings"
 	"time"
@@ -25,6 +26,8 @@ func NewInjector(payloadName string) *Injector {
 }
 
 func (i *Injector) Do(ctx context.Context) error {
+	log.Infof("Testing %s", i.payloadName)
+
 	url := i.setPayload(i.url)
 
 	req, err := http.NewRequestWithContext(ctx, i.method, url, nil)

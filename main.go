@@ -30,7 +30,7 @@ func main() {
 }
 
 func injectPayloads(cfg *Config, ctx context.Context) {
-	for payload := range payloads.All {
+	for _, payload := range payloads.GetNames() {
 		injector := NewInjector(payload).
 			WithListenerConfig(cfg.Listener).
 			WithUrl(cfg.Request.Url)

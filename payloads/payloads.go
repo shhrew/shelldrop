@@ -4,11 +4,12 @@ import (
 	_ "embed"
 	"net/url"
 	"shelldrop/log"
+	"sort"
 	"strconv"
 	"strings"
 )
 
-var All = map[string]string{
+var payloads = map[string]string{
 	"bash_tcp_1": bashTcp1,
 	"bash_tcp_2": bashTcp2,
 	"bash_tcp_3": bashTcp3,
@@ -20,8 +21,17 @@ var All = map[string]string{
 	"php_6":      php6,
 }
 
+func GetNames() []string {
+	keys := make([]string, 0, len(payloads))
+	for key := range payloads {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
 func Get(name string, lhost string, lport int) string {
-	payload, ok := All[name]
+	payload, ok := payloads[name]
 	if !ok {
 		log.Fatalf("Invalid payload specified: %s", name)
 	}
