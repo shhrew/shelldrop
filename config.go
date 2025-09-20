@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"shelldrop/log"
+	"strings"
 
 	"github.com/akamensky/argparse"
 )
@@ -26,9 +28,9 @@ type (
 )
 
 func ParseConfig() *Config {
-	parser := argparse.NewParser("shelldrop", `Leverages a command injection vulnerability by finding and executing compatible reverse shell payloads.
+	parser := argparse.NewParser("shelldrop", fmt.Sprintf(`A command injection tool that automatically tests for working reverse shell payloads.
 
-[*] = Asterisked arguments can contain the SHELLDROP injection keyword`)
+[*] = Asterisked arguments can contain the SHELLDROP injection keyword`))
 
 	url := parser.String("u", "url", &argparse.Options{Required: true, Help: "The target url [*]"})
 	lhost := parser.String("l", "lhost", &argparse.Options{Required: true, Help: "The listen address"})
@@ -41,9 +43,7 @@ func ParseConfig() *Config {
 		os.Exit(1)
 	}
 
-	// todo: validate at least one argument has SHELLDROP keyword
-
-	return &Config{
+	cfg := &Config{
 		Payload: *payload,
 		Listener: ListenerConfig{
 			Disabled: *noListener,
@@ -54,4 +54,18 @@ func ParseConfig() *Config {
 			Url: *url,
 		},
 	}
+
+	if !cfg.hasShellDropKeyword() {
+		log.Fatal("No SHELLDROP injection keyword found in configuration")
+	}
+
+	return cfg
+}
+
+func (c *Config) hasShellDropKeyword() bool {
+	if strings.Contains(c.Request.Url, ShellDropKeyword) {
+		return true
+	}
+
+	return false
 }

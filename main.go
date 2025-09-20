@@ -8,6 +8,10 @@ import (
 	"shelldrop/payloads"
 )
 
+const (
+	ShellDropKeyword = "SHELLDROP"
+)
+
 func main() {
 	cfg := ParseConfig()
 	ctx, cancel := context.WithCancel(context.Background())

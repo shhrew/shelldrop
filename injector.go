@@ -58,5 +58,5 @@ func (i *Injector) WithUrl(url string) *Injector {
 
 func (i *Injector) setPayload(value string) string {
 	payload := payloads.GetUrlEncoded(i.payloadName, i.listenerConfig.Host, i.listenerConfig.Port)
-	return strings.Replace(value, "SHELLDROP", payload, -1)
+	return strings.Replace(value, ShellDropKeyword, payload, -1)
 }
