@@ -28,8 +28,8 @@ usage: shelldrop [-h|--help] -l|--lhost "<value>" -p|--lport <integer>
                  [-P|--payload "<value>"] -u|--url "<value>" [-X|--method
                  (GET|POST|PUT|PATCH|DELETE)] [-d|--data "<value>"]
                  [-H|--header "<value>" [-H|--header "<value>" ...]]
-                 [-C|--cookie "<value>" [-C|--cookie "<value>" ...]]
-                 [--no-listener] [--no-color]
+                 [-C|--cookie "<value>" [-C|--cookie "<value>" ...]] [--timeout
+                 <integer>] [--no-listener] [--no-color]
 
                  A command injection tool that automatically tests for working
                  reverse shell payloads.
@@ -47,6 +47,7 @@ Arguments:
   -d  --data         POST data [*]
   -H  --header       Header "Name: Value" pairs, can be used multiple times [*]
   -C  --cookie       Cookie "Name=Value" pairs, can be used multiple times [*]
+      --timeout      The request timeout in seconds. Default: 5
       --no-listener  Disable the built-in listener
       --no-color     Disable color output
 ```

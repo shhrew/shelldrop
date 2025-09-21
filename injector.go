@@ -19,6 +19,7 @@ type (
 		data           string
 		headers        map[string]string
 		cookies        map[string]string
+		timeout        int
 	}
 )
 
@@ -69,7 +70,7 @@ func (i *Injector) Do(ctx context.Context) error {
 	}
 
 	client := &http.Client{
-		Timeout: 3 * time.Second,
+		Timeout: time.Duration(i.timeout) * time.Second,
 	}
 
 	resp, err := client.Do(req)
@@ -108,6 +109,11 @@ func (i *Injector) WithHeaders(headers map[string]string) *Injector {
 
 func (i *Injector) WithCookies(cookies map[string]string) *Injector {
 	i.cookies = cookies
+	return i
+}
+
+func (i *Injector) WithTimeout(timeout int) *Injector {
+	i.timeout = timeout
 	return i
 }
 

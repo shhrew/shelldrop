@@ -29,6 +29,7 @@ type (
 		Data    string
 		Headers map[string]string
 		Cookies map[string]string
+		Timeout int
 	}
 )
 
@@ -67,6 +68,7 @@ func ParseConfig() *Config {
 			return nil
 		},
 	})
+	timeout := parser.Int("", "timeout", &argparse.Options{Required: false, Help: "The request timeout in seconds", Default: 5})
 
 	noListener := parser.Flag("", "no-listener", &argparse.Options{Required: false, Help: "Disable the built-in listener"})
 	noColor := parser.Flag("", "no-color", &argparse.Options{Required: false, Help: "Disable color output"})
@@ -93,6 +95,7 @@ func ParseConfig() *Config {
 			Data:    *data,
 			Headers: parseHeaders(headers),
 			Cookies: parseCookies(cookies),
+			Timeout: *timeout,
 		},
 	}
 
