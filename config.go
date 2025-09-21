@@ -28,6 +28,7 @@ type (
 		Method  string
 		Data    string
 		Headers map[string]string
+		Cookies map[string]string
 	}
 )
 
@@ -49,6 +50,18 @@ func ParseConfig() *Config {
 			for _, arg := range args {
 				if !strings.Contains(arg, ":") {
 					return fmt.Errorf("header must be in the format 'Name: Value': %s", arg)
+				}
+			}
+			return nil
+		},
+	})
+	cookies := parser.StringList("C", "cookie", &argparse.Options{
+		Required: false,
+		Help:     `Cookie "Name=Value" pairs, can be used multiple times [*]`,
+		Validate: func(args []string) error {
+			for _, arg := range args {
+				if !strings.Contains(arg, "=") {
+					return fmt.Errorf("cookie must be in the format 'Name=Value': %s", arg)
 				}
 			}
 			return nil
@@ -79,6 +92,7 @@ func ParseConfig() *Config {
 			Method:  *method,
 			Data:    *data,
 			Headers: parseHeaders(headers),
+			Cookies: parseCookies(cookies),
 		},
 	}
 
@@ -103,6 +117,13 @@ func (c *Config) hasShellDropKeyword() bool {
 			}
 		}
 	}
+	if len(c.Request.Cookies) > 0 {
+		for _, cookie := range c.Request.Cookies {
+			if strings.Contains(cookie, ShellDropKeyword) {
+				return true
+			}
+		}
+	}
 
 	return false
 }
@@ -114,4 +135,13 @@ func parseHeaders(headers *[]string) map[string]string {
 		h[strings.Trim(parts[0], " ")] = strings.Trim(strings.Join(parts[1:], ":"), " ")
 	}
 	return h
+}
+
+func parseCookies(cookies *[]string) map[string]string {
+	c := make(map[string]string)
+	for _, cookie := range *cookies {
+		parts := strings.Split(cookie, "=")
+		c[strings.Trim(parts[0], " ")] = strings.Trim(strings.Join(parts[1:], "="), " ")
+	}
+	return c
 }

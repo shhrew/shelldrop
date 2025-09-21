@@ -31,14 +31,19 @@ func main() {
 	}
 }
 
+// todo: improve logging here, some kind of progress bar / dynamic update?
 func injectPayloads(cfg *Config, ctx context.Context) bool {
 	if cfg.Payload != "" {
+		log.Info("Testing 1 payload")
 		if injectPayload(cfg.Payload, cfg, ctx) {
 			return true
 		}
+		return false
 	}
 
-	for _, payload := range payloads.GetNames() {
+	names := payloads.GetNames()
+	log.Infof("Testing %d payloads", len(names))
+	for _, payload := range names {
 		if injectPayload(payload, cfg, ctx) {
 			return true
 		}
@@ -53,7 +58,8 @@ func injectPayload(payload string, cfg *Config, ctx context.Context) bool {
 		WithMethod(cfg.Request.Method).
 		WithUrl(cfg.Request.Url).
 		WithData(cfg.Request.Data).
-		WithHeaders(cfg.Request.Headers)
+		WithHeaders(cfg.Request.Headers).
+		WithCookies(cfg.Request.Cookies)
 
 	if err := injector.Do(ctx); err != nil {
 		if os.IsTimeout(err) || errors.Is(err, context.Canceled) {
