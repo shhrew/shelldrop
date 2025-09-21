@@ -6,6 +6,9 @@ import (
 	"os"
 	"shelldrop/log"
 	"shelldrop/payloads"
+
+	"github.com/fatih/color"
+	"github.com/k0kubun/go-ansi"
 )
 
 const (
@@ -13,6 +16,8 @@ const (
 )
 
 func main() {
+	color.Output = ansi.NewAnsiStdout()
+
 	cfg := ParseConfig()
 	ctx, cancel := context.WithCancel(context.Background())
 
