@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"shelldrop/log"
 	"shelldrop/payloads"
@@ -36,13 +37,12 @@ func main() {
 	}
 }
 
-// todo: improve logging here, some kind of progress bar / dynamic update?
 func injectPayloads(cfg *Config, ctx context.Context) bool {
 	if cfg.Payload != "" {
-		log.Info("Testing 1 payload")
 		if injectPayload(cfg.Payload, cfg, ctx) {
 			return true
 		}
+		fmt.Println("")
 		return false
 	}
 
@@ -58,6 +58,9 @@ func injectPayloads(cfg *Config, ctx context.Context) bool {
 }
 
 func injectPayload(payload string, cfg *Config, ctx context.Context) bool {
+	greyText := color.New(color.FgHiBlack).Sprintf("Testing payload: %s", payload)
+	log.DynamicOutput(greyText)
+
 	injector := NewInjector(payload).
 		WithListenerConfig(cfg.Listener).
 		WithMethod(cfg.Request.Method).

@@ -48,7 +48,11 @@ func Success(message string) {
 	Successf("%s", message)
 }
 
+func DynamicOutput(message string) {
+	fmt.Printf("\r\033[2K%s", message)
+}
+
 func output(colorAttribute color.Attribute, prefix, message string) {
 	prefixColor := color.New(colorAttribute).SprintFunc()
-	fmt.Println(fmt.Sprintf("%s %s", prefixColor(prefix), message))
+	fmt.Println(fmt.Sprintf("\r%s %s", prefixColor(prefix), message))
 }

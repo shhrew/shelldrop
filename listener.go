@@ -54,8 +54,8 @@ func (r *Listener) acceptConnections() {
 			return
 		}
 
-		log.Successf("Connection received from %s", conn.RemoteAddr().String())
 		r.cancel()
+		log.Successf("Connection received from %s", conn.RemoteAddr().String())
 
 		select {
 		case r.connections <- conn:
